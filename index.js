@@ -1,46 +1,51 @@
 /** 
+@description The main purpose of this program is taking screenshots from the urls that 
+are given to it by the user. It saves the screenshot in .jpg format.
 @author CaptainCluster
-https://github.com/CaptainCluster
+@link https://github.com/CaptainCluster
 */
-
-/* 
-We will use readline to get the url from the user 
-Puppeteer will be used to enter the website and save the screenshot.
-URL import will be used to help us validate the url the user gives
-*/
-import puppeteer from "puppeteer";
-import readline from "readline";
-import { URL } from "url";
+import puppeteer from "puppeteer"; //interactions with websites 
+import readline from "readline"; //input from the user
+import { URL } from "url"; //validating the url the user gives
 
 mainFunction(); 
 
+/**
+ * @function mainFunction
+ * @description - Forms the heart of the program and handles the main process
+ */
 async function mainFunction(){
   try{
-    //We will launch the browser using puppeteer here, making it reusable
+    //We shall launch the browser here, making it re-usable.
     const browser = await puppeteer.launch();
-    let userExitLoop = ""; //This variable is used to exit the while-loop below.
-
-    while(userExitLoop != "n"){
-      userExitLoop = ""; //This will be reset once again for the "DO YOU WANT TO CONTINUE" while-loop
+    let userEndProgram = "";
+    //The following while-loop will handle the entire process, from asking for core information
+    //regarding the site to taking and saving the screenshot. Any exceptions will lead to the loop
+    //starting all over, for example, an invalid url.
+    while(userEndProgram != "n"){
+      userEndProgram = ""
       const url = await askUserInput("Give the url: ");
-      //The process will be restarted if the url is invalid.
+
+      //Making sure the url given by the user is a valid one. If not, the loop is restarted.
       if(confirmUrl(url)){
         let fileName = "";
-        while(fileName == ""){
+
+        while(fileName == ""){ //Making sure the user gives a file name (for saving the screenshot).
           fileName = await askUserInput("Give the file name (.jpg will be added automatically): ");
         }
         //The program attempts to remove invalid characters from the given file name.
         fileName = fileName.replace(/[\\/*?:"<>|]/g, '');
+
         await takeScreenShot(url, fileName, browser);
+        //Asking the user whether they want to capture more screenshots or not
+        //y = yes, n = no
+        while(userEndProgram != "y" && userEndProgram!= "n"){
+          userEndProgram = await askUserInput("Do you want to continue? y/n: ");
+          userEndProgram = userEndProgram.toLowerCase();
 
-        //We want to ask for a certain input to confirm the user is done.
-        while(userExitLoop != "y" && userExitLoop!= "n"){
-          userExitLoop = await askUserInput("Do you want to continue? y/n: ");
-          userExitLoop = userExitLoop.toLowerCase();
-
-          if(userExitLoop == "y"){
+          if(userEndProgram == "y"){
             console.log("Continuing...\n");
-          } else if(userExitLoop == "n"){
+          } else if(userEndProgram == "n"){
             console.log("Thank you for using the program!");
           } else{
             console.log("Please enter a valid letter.\n");
@@ -59,33 +64,39 @@ async function mainFunction(){
   }
 }
 
+/**
+ * @function askUserInput
+ * @param {String} consoleText - The text that helps the user understand what information he has to give
+ * @returns {String} - The function will return the input given by the user.
+ */
 async function askUserInput(consoleText){
-  //This function will be used to ask the user a certain input.
-  //The consoleText parameter will contain the text that 
-  //indicates what kind of information we want from the user.
   return new Promise((resolve) => {
+    //We will use readline to create an interface that can read the user input
     const readlineInterface = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
-    //Next up, the program asks for the input
-    readlineInterface.question(consoleText, (input) => {
+    //Next up, the program that asks for the input
+    readlineInterface.question(consoleText, (userInput) => {
       readlineInterface.close();
-      resolve(input); 
+      resolve(userInput); 
     });
   });
 }
 
+/**
+ * @function takeScreenShot
+ * @param {String} url - the url (validated at this point) the user has given
+ * @param {String} fileName - the file name (validated at this point) the user has given
+ * @param {puppeteerBrowser} browser - the browser that was launched at the start of the program
+ */
 async function takeScreenShot(url, fileName, browser){
-  //We will use puppeteer to enter the url and then it will
-  //take a screenshot and save it in .jpg format.
   try{
     const webPage = await browser.newPage();
-
     await webPage.setViewport({width : 1920, height: 1080});
     await webPage.goto(url);
-
     //The program will save the screenshot to the savedimages folder.
+    //The .jpg  format is automatically determined
     const path = "savedimages/" + fileName + ".jpg";
     await webPage.screenshot({path: path});
 
@@ -96,8 +107,11 @@ async function takeScreenShot(url, fileName, browser){
   }
 }
 
+/**
+ * @param {String} url - The url that the user has given. This is what will be checked.
+ * @returns {Boolean} - Either true or false, depending on if the url is deemed valid.
+ */
 function confirmUrl(url){
-  //This function makes sure the given url is valid and returns a boolean value.
   try{
     new URL(url);
     return true;
