@@ -29,13 +29,11 @@ async function mainFunction(){
         while(fileName == ""){
           fileName = await askUserInput("Give the file name (.jpg will be added automatically): ");
         }
-        //The program attempts to remove discovered invalid characters from the given file name.
+        //The program attempts to remove invalid characters from the given file name.
         fileName = fileName.replace(/[\\/*?:"<>|]/g, '');
         await takeScreenShot(url, fileName, browser);
 
-        //We want to ask for a certain input to confirm the user is done. If the input is anything but the 
-        //one we are looking for, the program will continue the while-loop.
-
+        //We want to ask for a certain input to confirm the user is done.
         while(userExitLoop != "y" && userExitLoop!= "n"){
           userExitLoop = await askUserInput("Do you want to continue? y/n: ");
           userExitLoop = userExitLoop.toLowerCase();
