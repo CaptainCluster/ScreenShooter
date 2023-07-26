@@ -32,10 +32,8 @@ async function mainFunction(){
 
         while(fileName == ""){ //Making sure the user gives a file name (for saving the screenshot).
           fileName = await askUserInput("Give the file name (.jpg will be added automatically): ");
+          fileName = fileName.replace(/[\\/*?:"<>|]/g, '_'); //Replacing the invalid characters with '_'
         }
-        //The program attempts to remove invalid characters from the given file name.
-        fileName = fileName.replace(/[\\/*?:"<>|]/g, '');
-
         await takeScreenShot(url, fileName, browser);
         //Asking the user whether they want to capture more screenshots or not
         //y = yes, n = no
