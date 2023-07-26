@@ -18,12 +18,14 @@ async function mainFunction(){
   try{
     //We will launch the browser using puppeteer here, making it reusable
     const browser = await puppeteer.launch();
-    while(true){
+    let userExitLoop = ""; //This variable is used to exit the while-loop below.
+
+    while(userExitLoop != "n"){
+      userExitLoop = ""; //This will be reset once again for the "DO YOU WANT TO CONTINUE" while-loop
       const url = await askUserInput("Give the url: ");
       //The process will be restarted if the url is invalid.
       if(confirmUrl(url)){
         let fileName = "";
-
         while(fileName == ""){
           fileName = await askUserInput("Give the file name (.jpg will be added automatically): ");
         }
@@ -33,15 +35,21 @@ async function mainFunction(){
 
         //We want to ask for a certain input to confirm the user is done. If the input is anything but the 
         //one we are looking for, the program will continue the while-loop.
-        const confirmation = await askUserInput("If you want to stop searching for more screenshots, type 0: ");
-        if(confirmation.toLowerCase() == "0"){
-          break;
-        } else{
-          console.log("Continuing...");
+
+        while(userExitLoop != "y" && userExitLoop!= "n"){
+          userExitLoop = await askUserInput("Do you want to continue? y/n: ");
+          userExitLoop = userExitLoop.toLowerCase();
+
+          if(userExitLoop == "y"){
+            console.log("Continuing...\n");
+          } else if(userExitLoop == "n"){
+            console.log("Thank you for using the program!");
+          } else{
+            console.log("Please enter a valid letter.\n");
+          }
         }
-      }
+      } 
     }
-    console.log("Thank you for using the program!");
     await browser.close();
     process.exit(0);
   } catch(error){
