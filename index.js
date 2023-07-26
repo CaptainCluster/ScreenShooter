@@ -51,6 +51,7 @@ async function mainFunction(){
         }
       } 
     }
+    //Closing the browser and ending the program
     await browser.close();
     process.exit(0);
   } catch(error){
@@ -106,6 +107,7 @@ async function takeScreenShot(url, fileName, browser){
 }
 
 /**
+ * @function confirmUrl
  * @param {String} url - The url that the user has given. This is what will be checked.
  * @returns {Boolean} - Either true or false, depending on if the url is deemed valid.
  */
