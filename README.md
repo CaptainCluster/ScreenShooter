@@ -5,7 +5,7 @@ Dependencies
 ---
 📣 You need puppeteer in order to use the program.
 
-📣 Puppeteer will use your IP ADDRESS when entering websites!
+📣 Puppeteer will use your **IP ADDRESS** when entering websites!
 
-⬇️ **Installation via npm package manager |** 
+⬇️ Installation via npm package manager | 
 ```npm install puppeteer```
