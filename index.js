@@ -8,6 +8,7 @@ import puppeteer from "puppeteer"; //interactions with websites
 import readline from "readline"; //input from the user
 import { URL } from "url"; //validating the url the user gives
 
+import { config } from "./config.js"
 mainFunction(); 
 
 /**
@@ -18,35 +19,37 @@ async function mainFunction(){
   try{
     //We shall launch the browser here, making it re-usable.
     const browser = await puppeteer.launch();
-    let userEndProgram = "";
+
+    let userEndProgram = ""; //y ==> continue, n ==> end program
+
     //The following while-loop will handle the entire process, from asking for core information
     //regarding the site to taking and saving the screenshot. Any exceptions will lead to the loop
     //starting all over, for example, an invalid url.
-    while(userEndProgram != "n"){
+    while(userEndProgram != config.USER_INPUT_NO){
       userEndProgram = ""
-      const url = await askUserInput("Give the url: ");
+      const url = await askUserInput(config.USERINPUT_REQUEST_URL);
 
-      //Making sure the url given by the user is a valid one. If not, the loop is restarted.
+      //Making sure the url is valid
       if(confirmUrl(url)){
-        let fileName = "";
+        let screenshotFileName = "";
 
-        while(fileName == ""){ //Making sure the user gives a file name (for saving the screenshot).
-          fileName = await askUserInput("Give the file name (.jpg will be added automatically): ");
-          fileName = fileName.replace(/[\\/*?:"<>|]/g, '_'); //Replacing the invalid characters with '_'
+        while(screenshotFileName == ""){ 
+          screenshotFileName = await askUserInput(config.USERINPUT_REQUEST_FILENAME);
+          screenshotFileName = screenshotFileName.replace(/[\\/*?:"<>|]/g, '_'); //Replacing the invalid characters with '_'
         }
-        await takeScreenShot(url, fileName, browser);
+        await takeScreenShot(url, screenshotFileName, browser);
+
         //Asking the user whether they want to capture more screenshots or not
-        //y = yes, n = no
-        while(userEndProgram != "y" && userEndProgram!= "n"){
-          userEndProgram = await askUserInput("Do you want to continue? y/n: ");
+        while(userEndProgram != config.USER_INPUT_YES && userEndProgram!= config.USER_INPUT_NO){
+          userEndProgram = await askUserInput(config.USERINPUT_REQUEST_MESSAGE);
           userEndProgram = userEndProgram.toLowerCase();
 
-          if(userEndProgram == "y"){
-            console.log("Continuing...\n");
-          } else if(userEndProgram == "n"){
-            console.log("Thank you for using the program!");
+          if(userEndProgram == config.USER_INPUT_YES){
+            console.log(config.NOTIFICATION_CONTINUING);
+          } else if(userEndProgram == config.USER_INPUT_NO){
+            console.log(config.END_PROGRAM_THANKS);
           } else{
-            console.log("Please enter a valid letter.\n");
+            console.log(config.ERROR_INVALID_INPUT_MESSAGE);
           }
         }
       } 
@@ -55,7 +58,7 @@ async function mainFunction(){
     await browser.close();
     process.exit(0);
   } catch(error){
-    console.log("Encountered the following error: " + error);
+    console.log(config.ERROR_DEFAULT_MESSAGE + error);
     if(browser != undefined){
       await browser.close();
     }
@@ -64,11 +67,10 @@ async function mainFunction(){
 }
 
 /**
- * @function askUserInput
- * @param {String} consoleText - The text that helps the user understand what information he has to give
- * @returns {String} - The function will return the input given by the user.
+ * @param {String} inputInstruction - Instructions to the user on what input should be given
+ * @returns {String} - User input
  */
-async function askUserInput(consoleText){
+async function askUserInput(inputInstruction){
   return new Promise((resolve) => {
     //We will use readline to create an interface that can read the user input
     const readlineInterface = readline.createInterface({
@@ -76,7 +78,7 @@ async function askUserInput(consoleText){
       output: process.stdout
     });
     //Next up, the program that asks for the input
-    readlineInterface.question(consoleText, (userInput) => {
+    readlineInterface.question(inputInstruction, (userInput) => {
       readlineInterface.close();
       resolve(userInput); 
     });
@@ -84,39 +86,42 @@ async function askUserInput(consoleText){
 }
 
 /**
- * @function takeScreenShot
- * @param {String} url - the url (validated at this point) the user has given
- * @param {String} fileName - the file name (validated at this point) the user has given
+ * Taking the screenshot and saving it to a directory
+ * 
+ * @param {string} url - the url input provided by the user
+ * @param {string} fileName - the file name provided by the user
  * @param {puppeteerBrowser} browser - the browser that was launched at the start of the program
  */
 async function takeScreenShot(url, fileName, browser){
   try{
+    //First we open webPage and go to the url
     const webPage = await browser.newPage();
-    await webPage.setViewport({width : 1920, height: 1080});
+    await webPage.setViewport({width : config.SCREENSHOT_WIDTH, height: config.SCREENSHOT_HEIGHT});
     await webPage.goto(url);
-    //The program will save the screenshot to the savedimages folder.
-    //The .jpg  format is automatically determined
-    const path = "savedimages/" + fileName + ".jpg";
-    await webPage.screenshot({path: path});
 
+    //Now that webPage is ready, we can take the screenshot.
+    const path = config.FILE_DIRECTORY + fileName + config.FILE_FORMAT_JPG;
+    await webPage.screenshot({path: path});
     await webPage.close();
-    console.log("The screenshot has been successfully saved!\n")
+
+    console.log(config.NOTIFICATION_SCREENSHOT_SAVED)
   } catch(error){
-    console.log("Encountered the following error: " + error);
+    console.log(config.ERROR_DEFAULT_MESSAGE + error);
   }
 }
 
 /**
- * @function confirmUrl
- * @param {String} url - The url that the user has given. This is what will be checked.
- * @returns {Boolean} - Either true or false, depending on if the url is deemed valid.
+ * Figuring out whether the url is valid or not
+ * 
+ * @param {string} url - the url input provided by the user
+ * @returns {boolean}
  */
 function confirmUrl(url){
   try{
     new URL(url);
     return true;
   } catch(error){
-    console.log("The input you gave seems to be invalid. Try again.\n");
+    console.log(config.ERROR_INVALID_INPUT_MESSAGE);
     return false;
   }
 }
