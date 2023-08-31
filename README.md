@@ -1,5 +1,5 @@
 # SiteShooter
-A program that visits the url you choose, takes a screenshot off of it and saves the screenshot. 
+A program that uses Puppeteer to visit the url given by the user and take a screenshot. The screenshot will then be saved for the user to view.
 
 Dependencies
 ---
