@@ -1,24 +1,23 @@
 /** 
-@description The main purpose of this program is taking screenshots from the urls that 
-are given to it by the user. It saves the screenshot in .jpg format.
-@author CaptainCluster
-@link https://github.com/CaptainCluster
+* This program takes a screenshot from the url the user has given. The user will
+* specify both the url and the file name of the saved screenshot.
+*
+* @author CaptainCluster
+* https://github.com/CaptainCluster
 */
-import puppeteer from "puppeteer"; //interactions with websites 
-import readline from "readline"; //input from the user
-import { URL } from "url"; //validating the url the user gives
 
-import { config } from "./config.js"
+
+
+import puppeteer from "puppeteer";    //interactions with websites 
+import readline from "readline";      //input from the user
+import { URL } from "url";            //validating the url the user gives
+import { config } from "./config.js"  //A bunch of 
 mainFunction(); 
 
-/**
- * @function mainFunction
- * @description - Forms the heart of the program and handles the main process
- */
 async function mainFunction(){
   try{
     //We shall launch the browser here, making it re-usable.
-    const browser = await puppeteer.launch();
+    const puppeteerBrowser = await puppeteer.launch();
 
     let userEndProgram = ""; //y ==> continue, n ==> end program
 
@@ -37,7 +36,7 @@ async function mainFunction(){
           screenshotFileName = await askUserInput(config.USERINPUT_REQUEST_FILENAME);
           screenshotFileName = screenshotFileName.replace(/[\\/*?:"<>|]/g, '_'); //Replacing the invalid characters with '_'
         }
-        await takeScreenShot(url, screenshotFileName, browser);
+        await takeScreenShot(url, screenshotFileName, puppeteerBrowser);
 
         //Asking the user whether they want to capture more screenshots or not
         while(userEndProgram != config.USER_INPUT_YES && userEndProgram!= config.USER_INPUT_NO){
@@ -55,12 +54,12 @@ async function mainFunction(){
       } 
     }
     //Closing the browser and ending the program
-    await browser.close();
+    await puppeteerBrowser.close();
     process.exit(0);
   } catch(error){
     console.log(config.ERROR_DEFAULT_MESSAGE + error);
-    if(browser != undefined){
-      await browser.close();
+    if(puppeteerBrowser != undefined){
+      await puppeteerBrowser.close();
     }
     process.exit(0);
   }
@@ -90,12 +89,12 @@ async function askUserInput(inputInstruction){
  * 
  * @param {string} url - the url input provided by the user
  * @param {string} fileName - the file name provided by the user
- * @param {puppeteerBrowser} browser - the browser that was launched at the start of the program
+ * @param {puppeteerBrowser} puppeteerBrowser - the browser that was launched at the start of the program
  */
-async function takeScreenShot(url, fileName, browser){
+async function takeScreenShot(url, fileName, puppeteerBrowser){
   try{
     //First we open webPage and go to the url
-    const webPage = await browser.newPage();
+    const webPage = await puppeteerBrowser.newPage();
     await webPage.setViewport({width : config.SCREENSHOT_WIDTH, height: config.SCREENSHOT_HEIGHT});
     await webPage.goto(url);
 

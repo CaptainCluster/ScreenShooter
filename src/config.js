@@ -1,3 +1,13 @@
+/** 
+* Here we have a const object that stores a bunch of values that will be used
+* in the index.js file.
+*
+* @author CaptainCluster
+* https://github.com/CaptainCluster
+*/
+
+
+
 const config = {
     USER_INPUT_YES : "y",
     USER_INPUT_NO : "n",
