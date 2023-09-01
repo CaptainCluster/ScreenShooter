@@ -11,7 +11,7 @@
 import puppeteer from "puppeteer";    //interactions with websites 
 import readline from "readline";      //input from the user
 import { URL } from "url";            //validating the url the user gives
-import { config } from "./config.js"  //A bunch of 
+import { config } from "./config.js"  //A const object with a bunch of defined values
 mainFunction(); 
 
 async function mainFunction(){
