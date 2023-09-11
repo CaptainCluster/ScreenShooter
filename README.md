@@ -9,3 +9,9 @@ Dependencies
 
 ⬇️ Installation via npm package manager | 
 ```npm install puppeteer```
+
+Instructions
+---
+1. Type the following in the terminal: ```node [your directory]/index.js```
+2. Type the link you want the program to enter
+3. Give the screenshot file a name
